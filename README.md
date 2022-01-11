@@ -1,5 +1,5 @@
 # INSTAGRAM--SCRAPPER
--conda create -n <environment-name> --file req.txt
+-conda create -n (environment-name) --file req.txt
 
 -put username password in .env file
 
