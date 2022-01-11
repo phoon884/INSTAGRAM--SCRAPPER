@@ -9,7 +9,9 @@ import time
 
 WEBSITE = "https://www.instagram.com/"
 PATH = "chromedriver.exe"
-
+SHORT_WAIT = 2
+MID_WAIT = 5
+LONG_WAIT =  10
 
 class IGScrapper:
     def __init__(self, username, password):
@@ -23,16 +25,17 @@ class IGScrapper:
 
     def __login(self):
         self.driver.get(WEBSITE)
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+        WebDriverWait(self.driver, MID_WAIT).until(EC.presence_of_element_located(
             (By.XPATH, '//input[@aria-label="Phone number, username, or email"]'))).send_keys(self.__username)
         self.driver.find_element_by_xpath(
             '//input[@aria-label="Password"]').send_keys(self.__password)
+        time.sleep(SHORT_WAIT)
         self.driver.find_element_by_xpath('//button[@type="submit"]').click()
-        time.sleep(2)
+        time.sleep(SHORT_WAIT)
         try:
-            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located(
+            WebDriverWait(self.driver, LONG_WAIT).until(EC.presence_of_element_located(
                 (By.XPATH, '//img[@alt="Instagram"]'))).click()
-            WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+            WebDriverWait(self.driver, MID_WAIT).until(EC.presence_of_element_located(
                 (By.XPATH, '//button[contains(text(),"Not Now")]'))).click()
         except Exception as e:
             print(e)
@@ -41,12 +44,12 @@ class IGScrapper:
 
     def __scroll(self, element):
         for x in range(20):
-            last_height = scraper.driver.execute_script(
+            last_height = self.driver.execute_script(
                 "return arguments[0].scrollHeight", element)
-            time.sleep(2)
+            time.sleep(SHORT_WAIT)
             self.driver.execute_script(
                 'arguments[0].scrollTop = arguments[0].scrollHeight', element)
-            current_height = scraper.driver.execute_script(
+            current_height = self.driver.execute_script(
                 "return arguments[0].scrollHeight", element)
             if current_height == last_height:
                 break
@@ -59,22 +62,26 @@ class IGScrapper:
         self.driver.get(WEBSITE)
 
     def get_followers(self, profile_name):
-        self.go_to_profile(profile_name)
-        WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
-            (By.XPATH, '//a[@href="/{}/followers/"]'.format(scraper.profile_name)))).click()
-        scrollable_div = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
-            (By.XPATH, '//div[@class="isgrP"]')))
-        self.__scroll(scrollable_div)
-        arr = scraper.driver.find_elements_by_xpath(
-            '//img[@data-testid="user-avatar"]')
-        array = []
-        for img in arr:
-            text = img.get_attribute('alt')
-            text = text.replace("'s profile picture", '')
-            if text == scraper.profile_name:
-                continue
-            array.append(text)
-        return array
+        try:
+            self.go_to_profile(profile_name)
+            WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+                (By.XPATH, '//a[@href="/{}/followers/"]'.format(self.profile_name)))).click()
+            scrollable_div = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
+                (By.XPATH, '//div[@class="isgrP"]')))
+            self.__scroll(scrollable_div)
+            arr = self.driver.find_elements_by_xpath(
+                '//img[@data-testid="user-avatar"]')
+            array = []
+            for img in arr:
+                text = img.get_attribute('alt')
+                text = text.replace("'s profile picture", '')
+                if text == self.profile_name:
+                    continue
+                array.append(text)
+            return array
+        except Exception as e:
+            print(e)
+            return []
     def quit(self):
         if (self.driver != None):
             self.driver.quit();
