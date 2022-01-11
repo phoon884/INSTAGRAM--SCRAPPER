@@ -2,6 +2,7 @@
 conda create -n <environment-name> --file req.txt
 
 put username password in .env file
+
 EXAMPLE:
 
 USER = "USERNAME"
