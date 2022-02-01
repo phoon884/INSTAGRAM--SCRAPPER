@@ -12,7 +12,7 @@ PATH = "chromedriver.exe"
 SHORT_WAIT = 2
 MID_WAIT = 5
 LONG_WAIT =  10
-MAX_SCROLL = 20
+MAX_SCROLL = 50
 
 class IGScrapper:
     def __init__(self, username, password):
@@ -66,10 +66,11 @@ class IGScrapper:
         try:
             self.go_to_profile(profile_name)
             WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
-                (By.XPATH, '//a[@href="/{}/followers/"]'.format(self.profile_name)))).click()
+                (By.XPATH, '//*[@href="/{}/followers/"]'.format(profile_name)))).click()
             scrollable_div = WebDriverWait(self.driver, 5).until(EC.presence_of_element_located(
                 (By.XPATH, '//div[@class="isgrP"]')))
             self.__scroll(scrollable_div)
+            time.sleep(SHORT_WAIT)
             arr = self.driver.find_elements_by_xpath(
                 '//img[@data-testid="user-avatar"]')
             array = []
@@ -88,12 +89,13 @@ class IGScrapper:
         try:
             self.go_to_profile(profile_name)
             WebDriverWait(self.driver, MID_WAIT).until(EC.presence_of_element_located(
-                (By.XPATH, '//a[@href="/{}/following/"]'.format(self.profile_name)))).click()
+                (By.XPATH, '//*[@href="/{}/following/"]'.format(profile_name)))).click()
             scrollable_div = WebDriverWait(self.driver, MID_WAIT).until(EC.presence_of_element_located(
                 (By.XPATH, '//div[@class="isgrP"]')))
             self.__scroll(scrollable_div)
             WebDriverWait(self.driver, MID_WAIT).until(EC.presence_of_element_located(
                 (By.XPATH, '//div[@class="PZuss"]')))
+            time.sleep(SHORT_WAIT)
             arr = self.driver.find_elements_by_xpath(
                 '//div[@class="PZuss"]//img[@data-testid="user-avatar"]')
             array = []
@@ -116,6 +118,6 @@ class IGScrapper:
 if __name__ == "__main__":
     load_dotenv()
     scraper = IGScrapper(os.environ['USER'], os.environ['PASSWORD'])
-    print(scraper.get_followers(scraper.profile_name))
-    print(scraper.get_following(scraper.profile_name))
+    print(scraper.get_followers("ffonggc"))
+    print(scraper.get_following("ffonggc"))
     scraper.quit()

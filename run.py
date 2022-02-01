@@ -3,9 +3,10 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+USER = ""
 scraper = IGScrapper(os.environ['USER'], os.environ['PASSWORD'])
-followers = scraper.get_followers(scraper.profile_name)
-following = scraper.get_following(scraper.profile_name)
+followers = scraper.get_followers(USER)
+following = scraper.get_following(USER)
 scraper.quit()
 
 result = []
